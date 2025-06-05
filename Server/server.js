@@ -1,9 +1,9 @@
 const express = require('express');
-const dotenv = require('dotenv').config();
+require('dotenv').config();
 const cors = require('cors');
-const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const connectDB = require('./config/mongodb');
+const AuthRouter = require('./routes/Auth.routes')
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -16,9 +16,12 @@ app.use(cookieParser());
 // MongoDB connection
 connectDB();
 
+//Api Endpoints 
 app.get('/',(req,res)=>{
   res.send("hello");
-})
+});
+
+app.use('/api/auth', AuthRouter);
 
 app.listen(PORT,()=> console.log(`Server is running on port ${PORT}`));
 
