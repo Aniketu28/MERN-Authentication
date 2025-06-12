@@ -114,14 +114,29 @@ const logout = async (req, res) => {
 const sendEmailVerificationOtp = async (req,res) =>{
   try {
 
-    const {userId} = req.body;
+    const userId = req.userId;
 
     const user = await userModel.findById(userId);
 
     if(user.isVerified){
       
-     return res.json({success:false,message:"Email Already verified"})
+      return res.json({success:false,message:"Email Already verified"})
+ 
+     } 
 
+    if (Date.now() > user.verifyotpExpireAt && user.verifyotpExpireAt != 0) {
+
+      user.verifyotp = "";
+
+      user.verifyotpExpireAt = 0;
+
+      await user.save();
+
+      return res.json({ success: false, message: "OTP expired send Again" });
+    }
+
+    if(user.verifyotp != ''){
+      return res.json({success:false,message:'Otp is Already send'});
     }
 
     const otp = String(Math.floor(100000 + Math.random() * 900000));
@@ -154,9 +169,10 @@ const sendEmailVerificationOtp = async (req,res) =>{
   }
 }
 
-const verifyEmail = async (req,res)=>{
+const verifyEmailOtp = async (req,res)=>{
 
-  const {userId,otp} = req.body;
+  const {otp} = req.body;
+  const userId = req.userId;
 
   if(!userId || !otp){
     return res.json({success:false,message:'otp required'});
@@ -169,7 +185,14 @@ const verifyEmail = async (req,res)=>{
       return res.json({success:false,message:'Invalid otp'});
     }
 
-    if(user.verifyotpExpireAt < Date.now()){
+    if(Date.now() > user.verifyotpExpireAt){
+
+      user.verifyotp = '';
+
+      user.verifyotpExpireAt = 0;
+
+      await user.save();
+
       return res.json({success:false,message:'otp Expired'});
     }
 
@@ -210,6 +233,21 @@ const sendResetOtp = async (req,res)=>{
       return res.json({ success: false, message: 'User Not found'});
     }
 
+    if(Date.now() > user.verifyotpExpireAt && user.verifyotpExpireAt != 0){
+
+      user.resetOtp = "";
+
+      user.resetOtpExpireAt = 0;
+
+      await user.save();
+
+      return res.json({success:false,message:'otp expired send Again'})
+    }
+
+    if(user.resetOtp != ''){
+      return res.json({ success: false, message: 'otp Already send'});
+    }
+
     const otp = String(Math.floor(100000 + Math.random() * 900000));
 
     user.resetOtp = otp;
@@ -240,13 +278,12 @@ const sendResetOtp = async (req,res)=>{
 
 }
 
-
 const resetPassword = async (req,res)=>{
    
     const {email, otp, newPassword} = req.body;
 
-    if(!email || !otp || !currentPassword || !newPassword ){
-      return res.json({success:false,message:'field email, otp, newPassword, currentPassword, are required'})
+    if(!email || !otp || !newPassword ){
+      return res.json({success:false,message:'field email, otp, newPassword are required'})
     }
 
     const user = await userModel.findOne({email});
@@ -277,4 +314,4 @@ const resetPassword = async (req,res)=>{
 }
 
 
-module.exports = { register, login, logout, sendEmailVerificationOtp, verifyEmail, isAuthenticated, sendResetOtp,resetPassword}
+module.exports = { register, login, logout, sendEmailVerificationOtp, verifyEmailOtp, isAuthenticated, sendResetOtp,resetPassword}

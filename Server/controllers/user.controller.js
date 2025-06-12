@@ -3,7 +3,7 @@ const userModel = require('../models/user.model');
 
 const getUserData = async (req, res) => {
 
-    const { userId } = req.body;
+    const userId  = req.userId;
 
     try {
 
