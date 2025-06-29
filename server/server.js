@@ -7,11 +7,15 @@ const AuthRouter = require('./routes/Auth.routes');
 const userRouter = require("./routes/user.route");
 const app = express();
 const PORT = process.env.PORT || 3000;
+const allowOrigin = ['*','http://localhost:5173']
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({credentials:true}));
+app.use(cors({
+  origin:allowOrigin,
+  credentials:true
+}));
 app.use(cookieParser());
 
 // MongoDB connection
