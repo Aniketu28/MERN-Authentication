@@ -49,7 +49,7 @@ const Login = () => {
         });
 
         if (data.success) {
-          navigate('/login');
+          setState('Login')
           toast.success(data.message);
         } else {
           toast.error(data.message);
