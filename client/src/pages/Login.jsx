@@ -101,7 +101,7 @@ const Login = () => {
               placeholder='Password'
               required />
           </div>
-          <p onClick={() => { navigate('/reset-password') }} className='mb-4 text-indigo-500 cursor-pointer px-2 py-1'>Forgot Password?</p>
+          {state !== 'sign up' && <p onClick={() => { navigate('/reset-password') }} className='mb-4 text-indigo-500 cursor-pointer px-2 py-1'>Forgot Password?</p>}
           <button type='submit' className='w-full rounded-full py-3 bg-gradient-to-r from-indigo-500 to-indigo-900
           text-white font-medium'>{state}</button>
         </form>
