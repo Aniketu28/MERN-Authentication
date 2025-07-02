@@ -233,7 +233,7 @@ const sendResetOtp = async (req,res)=>{
       return res.json({ success: false, message: 'User Not found'});
     }
 
-    if(Date.now() > user.verifyotpExpireAt && user.verifyotpExpireAt != 0){
+    if(Date.now() > user.resetOtpExpireAt && user.resetOtpExpireAt != 0){
 
       user.resetOtp = "";
 
